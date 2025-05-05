@@ -1,0 +1,9 @@
+.streamlit/
+
+.DS Store/
+
+.devcontainer/
+
+uallm/
+
+__pycache__/

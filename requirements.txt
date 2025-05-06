@@ -9,3 +9,4 @@ faiss-cpu
 chromadb==0.6.3
 pypdf
 mistralai
+pymupdf

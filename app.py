@@ -1,8 +1,8 @@
 import streamlit as st
-# from openai import OpenAI
 
-from utilities import (initiate_client, stream_llm_reply, 
-                       right_column_content, left_column_content)
+from utilities import (initiate_client, 
+                        left_column_content, right_column_content)
+from llm_resources import load_vectordb
 
 st.set_page_config(page_title="Bioinformatics Lab Assistant",
                    page_icon="🧬",
@@ -16,29 +16,10 @@ st.markdown(
             padding-top: 2%;
             padding-bottom: 0;
         }
-    
-    # /* Sticky page title */
-    # .sticky-title {
-    #     position: sticky;
-    #     top: 0;
-    #     z-index: 1000;
-    #     background-color: var(--background-color);
-    #     margin: 0;
-    #     padding: 1.2rem 0 0.6rem 0;
-    # }
-
-    # /* Scrollable chat box */
-    # #chat-scroll {
-    #     height: 560px;
-    #     overflow-y: auto;
-    #     padding-right: 8px;  /* keep scrollbar off the text */
-    # }
-
     </style>
     """,
     unsafe_allow_html=True,
 )
-
 
 # -----------------------------  MAIN APP  ----------------------------------- #
 def main() -> None:
@@ -52,6 +33,10 @@ def main() -> None:
         ]
     if "client" not in st.session_state:
         st.session_state.client = initiate_client()
+
+    if "vectordb" not in st.session_state:
+        # st.session_state.retriever = load_retriever("faiss_index_store")  # path on disk
+        st.session_state.vectordb = load_vectordb("faiss_index_store")
 
     # --- Layout: chat (left) • uploads (right) ---
     left_col, right_col = st.columns([3, 1], gap="small")

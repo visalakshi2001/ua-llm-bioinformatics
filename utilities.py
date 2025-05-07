@@ -2,7 +2,7 @@ import streamlit as st
 from openai import OpenAI
 
 from langchain_community.vectorstores import FAISS
-from llm_resources import retriever, Generator
+from llm_resources import retriever, Generator, make_docs_from_uploads
 
 # -----------------------------  UTILITIES  ---------------------------------- #
 @st.cache_resource
@@ -88,29 +88,19 @@ def right_column_content():
         "Upload notes, papers, or data files you might want to reference later.",
         accept_multiple_files=True,
         type=None,
-        label_visibility="collapsed",
     )
-    if uploaded_files:
-        st.success(f"{len(uploaded_files)} file(s) stored in session "
-                    "— This will soon be added to the LLM's context in next cycle")
-    
-    # confirm = st.button("Confirm upload", disabled=not uploaded_files, type="primary", use_container_width=True)
 
-    # if confirm and uploaded_files:
+    confirm = st.button("Confirm upload", disabled=not uploaded_files, type="primary", use_container_width=True)
 
-    #     st.session_state.uploading = True
-    #     # st.success(f"{len(uploaded_files)} file(s) stored in session "
-    #     #             "— we'll wire them into the LLM in the next step.")
-    #     with st.spinner("Uploading context, please wait..."):
-    #         import time
+    if confirm and uploaded_files:
 
-    #         time.sleep(5)
-
-    #     for f in uploaded_files:
-    #         st.write(f)
-
-    #     st.session_state.uploading = False
-    #     st.success(f"Added {len(uploaded_files)} new document(s) to context", icon="📚")
+        st.session_state.uploading = True
+        with st.spinner("Uploading context, please wait..."):
+            new_docs = make_docs_from_uploads(uploaded_files)
+            st.session_state.vectordb.add_documents(new_docs)
+        
+        st.session_state.uploading = False
+        st.success(f"Added {len(uploaded_files)} new document(s) to context", icon="📚")
         
 def left_column_content():
     chat_msg_placeholder = st.container(height=500, border=False)
